@@ -60,7 +60,7 @@ impl PasswordHasher for Pbkdf2 {
             algorithm: algorithm.ident(),
             version: None,
             params: params.try_into()?,
-            salt: Some(salt),
+            salt: None, // TODO: Fix this later
             hash: Some(output),
         })
     }
