@@ -35,7 +35,7 @@ impl PasswordHasher for Pbkdf2 {
         alg_id: Option<Ident<'a>>,
         version: Option<Decimal>,
         params: Params,
-        salt_bytes: &[u8],
+        salt: impl Into<Salt<'a>>,
     ) -> Result<PasswordHash<'a>> {
         let algorithm = Algorithm::try_from(alg_id.unwrap_or(PBKDF2_SHA256))?;
 
@@ -43,6 +43,10 @@ impl PasswordHasher for Pbkdf2 {
         if version.is_some() {
             return Err(Error::Version);
         }
+
+        let salt = salt.into();
+        let mut salt_arr = [0u8; 64];
+        let salt_bytes = salt.b64_decode(&mut salt_arr)?;
 
         let output = Output::init_with(params.output_length, |out| {
             let f = match algorithm {
@@ -60,7 +64,7 @@ impl PasswordHasher for Pbkdf2 {
             algorithm: algorithm.ident(),
             version: None,
             params: params.try_into()?,
-            salt: None, // TODO: Fix this later
+            salt: Some(salt),
             hash: Some(output),
         })
     }
