@@ -44,8 +44,6 @@ impl PasswordHasher for Pbkdf2 {
             return Err(Error::Version);
         }
 
-        let salt_bytes = salt.b64_decode(&mut salt_arr)?;
-
         let output = Output::init_with(params.output_length, |out| {
             let f = match algorithm {
                 #[cfg(feature = "sha1")]
